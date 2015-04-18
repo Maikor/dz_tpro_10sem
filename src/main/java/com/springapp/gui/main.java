@@ -19,9 +19,6 @@ import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.table.DefaultTableModel;
-/**
- * Created by mkorshun on 4/8/2015.
- */
 
 public class main extends JFrame {
 
@@ -30,12 +27,12 @@ public class main extends JFrame {
     private DefaultTableModel tableModel;
     private JTextField txtField1;
     private JTextField txtField2;
+    ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
+    AuthorDaoImpl dao = ctx.getBean("AuthorDaoImpl", AuthorDaoImpl.class);
 
     private main() {
         createGUI();
     }
-
-
     private void articleFrame(){
         JFrame frame = new JFrame("Articles");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -92,14 +89,13 @@ public class main extends JFrame {
         });
 
     }
-    public void removeSelectedRows(JTable table){
+    private void removeSelectedRows(JTable table){
         DefaultTableModel model = (DefaultTableModel) this.table.getModel();
         int[] rows = table.getSelectedRows();
         for(int i=0;i<rows.length;i++){
             model.removeRow(rows[i]-i);
         }
     }
-
     private void crudFrame() {
 
         JFrame frame = new JFrame("Authors");
@@ -234,7 +230,6 @@ public class main extends JFrame {
             }
         });
     }
-
     private void createGUI() {
         JPanel westPanel = new JPanel();
         JPanel centralPanel = new JPanel();
@@ -307,7 +302,6 @@ public class main extends JFrame {
 
     }
 
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -330,8 +324,4 @@ public class main extends JFrame {
             }
         });
     }
-
-
-    ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
-    AuthorDaoImpl dao = ctx.getBean("AuthorDaoImpl", AuthorDaoImpl.class);
 }
