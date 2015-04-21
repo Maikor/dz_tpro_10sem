@@ -12,7 +12,6 @@ public class calculators {
 
     public void calculate_param (String string)
     {
-
         int wordCount = 0;
         boolean word = false;
         int endOfLine = string.length() - 1;
@@ -27,29 +26,16 @@ public class calculators {
             }
         }
         setWords(wordCount);
-
         int count = string.split("[!?.:]+").length;
         setSentences(count);
-
         setPrepos(countPrepositions(string));
-
     }
     public static int countPrepositions(String input) {
         int total = 0;
-		/* Using this pattern ((?i)of|until|about|at|in) I can match any
-		 * preposition, however, to remain case insensitive to avoid needing
-		 * two separate loops or a more complex pattern, I can use (?i) to
-		 * ignore the case of the word entirely.
-		 */
-
-        // List<String> prepositions = new ArrayList<String>();
         Matcher matches = Pattern.compile("((?i)of|until|about|at|in)").matcher(input);
-
         while (matches.find()) {
-            // Instead of an array with .size(), simply add to the total.
             total++;
         }
-
         return total;}
 
     public double words;
