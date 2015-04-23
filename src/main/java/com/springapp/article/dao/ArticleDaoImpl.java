@@ -2,10 +2,8 @@ package com.springapp.article.dao;
 
 import com.springapp.article.Article;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +45,7 @@ public class ArticleDaoImpl implements ArticleDao {
             arr[l][2] =Double.valueOf(row.get("prepos").toString());
             arr [l][3] = Double.valueOf(row.get("words").toString());
             l ++;
-//            Double s = Double.valueOf(row.get("sentences").toString());
-//            article.setId_author((Integer) row.get("id_author"));
-//            article.setSentences(Double.valueOf(row.get("sentences").toString()));
-//            article.setPrepos((Double.valueOf(row.get("prepos").toString())));
-//            article.setWords((Double.valueOf(row.get("words").toString())));
         }
-//        return jdbcTemplate.queryForObject(sql, new Article[]);
         return arr;
         }
 
