@@ -24,7 +24,6 @@ public class ArticleDaoImpl implements ArticleDao {
     public List<Article> getAllArticles() {
 
         String sql = " select * from Articles";
-//        ArticleRowMapper k = new ArticleRowMapperAdapter();
 
         return jdbcTemplate.query(sql, new ArticleRowMapper());
     }
