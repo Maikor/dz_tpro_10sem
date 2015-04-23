@@ -18,24 +18,80 @@ import java.util.Dictionary;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.table.DefaultTableModel;
-/**
- * Created by mkorshun on 4/8/2015.
- */
 
 public class main extends JFrame {
+
+    public double NEWwords;
+    public double NEWprepos;
+    public double NEWsentences;
+
+    public double getNEWwords() {
+        return NEWwords;
+    }
+
+    public void setNEWwords(double NEWwords) {
+        this.NEWwords = NEWwords;
+    }
+
+    public double getNEWprepos() {
+        return NEWprepos;
+    }
+
+    public void setNEWprepos(double NEWprepos) {
+        this.NEWprepos = NEWprepos;
+    }
+
+    public double getNEWsentences() {
+        return NEWsentences;
+    }
+
+    public void setNEWsentences(double NEWsentences) {
+        this.NEWsentences = NEWsentences;
+    }
+
+    public void calculate_param (String string)
+    {
+        int wordCount = 0;
+        boolean word = false;
+        int endOfLine = string.length() - 1;
+        for (int i = 0; i < string.length(); i++) {
+            if (Character.isLetter(string.charAt(i)) && i != endOfLine) {
+                word = true;
+            } else if (!Character.isLetter(string.charAt(i)) && word) {
+                wordCount++;
+                word = false;
+            } else if (Character.isLetter(string.charAt(i)) && i == endOfLine) {
+                wordCount++;
+            }
+        }
+        setNEWwords(wordCount);
+        int count = string.split("[!?.:]+").length;
+        setNEWsentences(count);
+        setNEWprepos(countPrepositions(string));
+    }
+    public static int countPrepositions(String input) {
+        int total = 0;
+        Matcher matches = Pattern.compile("((?i)of|until|about|at|in)").matcher(input);
+        while (matches.find()) {
+            total++;
+        }
+        return total;}
+
 
     private JTable table;
     private JButton btnAdd;
     private DefaultTableModel tableModel;
     private JTextField txtField1;
     private JTextField txtField2;
+    ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
+    AuthorDaoImpl dao = ctx.getBean("AuthorDaoImpl", AuthorDaoImpl.class);
 
     private main() {
         createGUI();
     }
-
-
     private void articleFrame(){
         JFrame frame = new JFrame("Articles");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -82,24 +138,23 @@ public class main extends JFrame {
                 ArticleDaoImpl dao = ctx.getBean("ArticleDaoImpl", ArticleDaoImpl.class);
                 List<Article> k = dao.getAllArticles();
                 for (Article f : k) {
-                    calculators l = new calculators();
-                    l.calculate_param(f.getContent().toString());
-
-                    dao.calcParams(f.getId(), l.getWords(), l.getPrepos(), l.getSentences());
+//                    calculators l = new calculators();
+                    calculate_param(f.getContent().toString());
+//TODO Transact script
+                    dao.calcParams(f.getId(), getNEWwords(),getNEWprepos(), getNEWsentences());
                 }
 
             }
         });
 
     }
-    public void removeSelectedRows(JTable table){
+    private void removeSelectedRows(JTable table){
         DefaultTableModel model = (DefaultTableModel) this.table.getModel();
         int[] rows = table.getSelectedRows();
         for(int i=0;i<rows.length;i++){
             model.removeRow(rows[i]-i);
         }
     }
-
     private void crudFrame() {
 
         JFrame frame = new JFrame("Authors");
@@ -234,7 +289,6 @@ public class main extends JFrame {
             }
         });
     }
-
     private void createGUI() {
         JPanel westPanel = new JPanel();
         JPanel centralPanel = new JPanel();
@@ -307,7 +361,6 @@ public class main extends JFrame {
 
     }
 
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -330,8 +383,4 @@ public class main extends JFrame {
             }
         });
     }
-
-
-    ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
-    AuthorDaoImpl dao = ctx.getBean("AuthorDaoImpl", AuthorDaoImpl.class);
 }
