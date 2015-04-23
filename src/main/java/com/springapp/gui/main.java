@@ -1,5 +1,7 @@
 package com.springapp.gui;
 
+import com.springapp.adapterPattern.MikeLogging;
+import com.springapp.adapterPattern.MikeLoggingAdapter;
 import com.springapp.article.Article;
 import com.springapp.article.dao.ArticleDao;
 import com.springapp.article.dao.ArticleDaoImpl;
@@ -273,7 +275,9 @@ public class main extends JFrame {
                     System.out.println("Id" + f.getId() + " First name " + f.getFirstname());
                     tableModel.addRow(new Object[]{f.getId(), f.getFirstname(), f.getLastname(), f.getNationality()});
 
+
                 }
+
             }
         });
 
@@ -296,6 +300,7 @@ public class main extends JFrame {
         JButton btnAuthorsCRUD = new JButton("Authors CRUD");
         JButton btnTexts = new JButton("Articles");
         JButton btnRecognize = new JButton("Recognize author by piece of text");
+        JButton btnReminder = new JButton("Days before deadline");
 //        JTextArea pieceOfText = new JTextArea();
         JTextArea display = new JTextArea(16, 58);
         JScrollPane scroll = new JScrollPane(display);
@@ -310,6 +315,7 @@ public class main extends JFrame {
         westPanel.add(btnAuthorsCRUD);
         westPanel.add(btnTexts);
         westPanel.add(btnRecognize);
+        westPanel.add(btnReminder);
         centralPanel.add(scroll);
 
         add(westPanel, BorderLayout.WEST);
@@ -317,6 +323,14 @@ public class main extends JFrame {
 //        add(pane,BorderLayout.CENTER);
         tableModel = new DefaultTableModel(new Object[]{"id","first name","last name"},0);
         table.setModel(tableModel);
+        btnReminder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MikeLogging mikeLogging = new MikeLogging();
+                MikeLoggingAdapter mikeLoggingAdapter = new MikeLoggingAdapter(mikeLogging);
+                mikeLoggingAdapter.store_info();
+            }
+        });
 
         btnAuthorsCRUD.addActionListener(new ActionListener() {
             @Override
