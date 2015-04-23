@@ -9,7 +9,7 @@ import java.sql.SQLException;
 /**
  * Created by mkorshun on 4/13/2015.
  */
-public class ArticleRowMapper implements ArticleRowMapperAdapter {
+public class ArticleRowMapper implements RowMapper<Article> {
     @Override
     public Article mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         Article article = new Article();

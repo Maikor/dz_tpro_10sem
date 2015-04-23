@@ -9,10 +9,11 @@ public class ArticleTest {
 
     @Test
     public void sayHello(){
-
         Article article = new Article();
         article.setId(3);
         Assert.assertEquals(3, article.getId());
-
     }
+
+
+
 }
