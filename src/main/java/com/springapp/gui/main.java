@@ -3,7 +3,6 @@ package com.springapp.gui;
 import com.springapp.adapterPattern.MikeLogging;
 import com.springapp.adapterPattern.MikeLoggingAdapter;
 import com.springapp.article.Article;
-import com.springapp.article.dao.ArticleDao;
 import com.springapp.article.dao.ArticleDaoImpl;
 import com.springapp.author.Author;
 import com.springapp.author.dao.AuthorDaoImpl;
@@ -16,13 +15,9 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.Dictionary;
 import java.util.List;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.table.DefaultTableModel;
 
 public class main extends JFrame {
 
@@ -84,10 +79,7 @@ public class main extends JFrame {
 
 
     private JTable table;
-    private JButton btnAdd;
     private DefaultTableModel tableModel;
-    private JTextField txtField1;
-    private JTextField txtField2;
     ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
     AuthorDaoImpl dao = ctx.getBean("AuthorDaoImpl", AuthorDaoImpl.class);
 
@@ -115,38 +107,30 @@ public class main extends JFrame {
         table.setModel(tableModel);
 
         frame.setLocationByPlatform(true);
-//        table.setRowHeight(200);
         frame.pack();
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         frame.setVisible(true);
-        btnAllArticles.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
-                ArticleDaoImpl dao = ctx.getBean("ArticleDaoImpl", ArticleDaoImpl.class);
+        btnAllArticles.addActionListener(e -> {
+            ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
+            ArticleDaoImpl dao = ctx.getBean("ArticleDaoImpl", ArticleDaoImpl.class);
 
-                List<Article> k = dao.getAllArticles();
-                tableModel.setRowCount(0);
-                for (Article f : k) {
-                    tableModel.addRow(new Object[]{f.getId(), f.getContent(), f.getWords(),
-                            f.getPrepos(), f.getSentences()});
-                }
+            List<Article> k = dao.getAllArticles();
+            tableModel.setRowCount(0);
+            for (Article f : k) {
+                tableModel.addRow(new Object[]{f.getId(), f.getContent(), f.getWords(),
+                        f.getPrepos(), f.getSentences()});
+
             }
         });
-        btnCalcParams.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btnCalcParams.addActionListener(e -> {
                 ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
                 ArticleDaoImpl dao = ctx.getBean("ArticleDaoImpl", ArticleDaoImpl.class);
                 List<Article> k = dao.getAllArticles();
                 for (Article f : k) {
-//                    calculators l = new calculators();
-                    calculate_param(f.getContent().toString());
-//TODO Transact script
-                    dao.calcParams(f.getId(), getNEWwords(),getNEWprepos(), getNEWsentences());
+                    calculate_param(f.getContent());
+                //TODO Transact script
+                    dao.calcParams(f.getId(), getNEWwords(), getNEWprepos(), getNEWsentences());
                 }
-
-            }
         });
 
     }
@@ -197,31 +181,23 @@ public class main extends JFrame {
         frame.setLocationByPlatform(true);
 
         frame.pack();
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         frame.setVisible(true);
 
-        btnCalcAVGparams.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btnCalcAVGparams.addActionListener(e ->  {
                 ArticleDaoImpl daoArticle = ctx.getBean("ArticleDaoImpl", ArticleDaoImpl.class);
-//                List<Article> articles = daoArticle.getParams();
                 double k[][] = daoArticle.getParams();
-                System.out.println("yo");
                 System.out.println(k.length);
-                for(int i = 0; i < k.length; i++)
-                {
-
-                    Integer temp = (int) k[i][0];
-//                    System.out.println("author id is" + temp);
-                    dao.updateAuthorsAVG(temp, k[i][3], k[i][2], k[i][1]);
-//                    System.out.println();
-                }
-//                System.out.println("updates");
+//            for(int i = 0; i < k.length; i++)
+//            {
+//                dao.updateAuthorsAVG((int) k[i][0], k[i][3], k[i][2], k[i][1]);
+//            }
+            for (double[] aK : k) {
+                dao.updateAuthorsAVG((int) aK[0], aK[3], aK[2], aK[1]);
             }
+
         });
-        btnUpdateAuthors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btnUpdateAuthors.addActionListener(e ->  {
                 System.out.println(table.getRowCount());
                 for (int x = 0; x < table.getRowCount(); x += 1){
                     System.out.println(table.getValueAt(x, 1) + " " + table.getValueAt(x, 2) + " "
@@ -230,67 +206,39 @@ public class main extends JFrame {
                             table.getValueAt(x, 1).toString(),
                             table.getValueAt(x, 2).toString(),
                             table.getValueAt(x, 3).toString());
-                }
             }
         });
-        btnDeleteAuthors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                System.out.println(table.getSelectedRow());
-//                System.out.println(table.getValueAt(table.getSelectedRow(),0));
+        btnDeleteAuthors.addActionListener(e ->  {
                 dao.deleteAuthorById((Integer) table.getValueAt(table.getSelectedRow(), 0));
                 removeSelectedRows(table);
-            }
         });
 
-        btnAddAuthors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btnAddAuthors.addActionListener(e ->  {
                 Author temp = new Author();
                 temp.setFirstname(tableModel.getValueAt(0, 1).toString());
                 temp.setLastname(tableModel.getValueAt(0, 2).toString());
                 temp.setNationality(tableModel.getValueAt(0, 3).toString());
-
                 dao.create(temp);
-            }
+
         });
 
-        btnClearTable.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btnClearTable.addActionListener(e ->  {
                 tableModel.setRowCount(1);
                 tableModel.setValueAt("", 0, 0);
                 tableModel.setValueAt("", 0, 1);
                 tableModel.setValueAt("", 0, 2);
 
-            }
-        });
-        btnAllAuthors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
+        });
+        btnAllAuthors.addActionListener( e ->  {
                 List<Author> k = dao.getAllAuthors();
                 tableModel.setRowCount(0);
-                for (Author f : k) {
-                    System.out.println("Id" + f.getId() + " First name " + f.getFirstname());
-                    tableModel.addRow(new Object[]{f.getId(), f.getFirstname(), f.getLastname(), f.getNationality()});
-
-
-                }
-
-            }
+                k.forEach(f -> tableModel.addRow(new Object[]{f.getId(), f.getFirstname(), f.getLastname(), f.getNationality()}));
         });
 
-        btnSearchAuthors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btnSearchAuthors.addActionListener(e ->  {
                 tableModel.setRowCount(0);
-                List<Author> k = dao.getAuthorByLastName(textSearch.getText());
-//                for (Author f : k) {
-//                    System.out.println("Id" + f.getId() + " First name " + f.getFirstname());
-////                    tableModel.addRow(new Object[]{f.getId(), f.getFirstname(), f.getLastname(), f.getNationality()});
-//                }
-            }
+//                List<Author> k = dao.getAuthorByLastName(textSearch.getText());
         });
     }
     private void createGUI() {
@@ -301,7 +249,6 @@ public class main extends JFrame {
         JButton btnTexts = new JButton("Articles");
         JButton btnRecognize = new JButton("Recognize author by piece of text");
         JButton btnReminder = new JButton("Days before deadline");
-//        JTextArea pieceOfText = new JTextArea();
         JTextArea display = new JTextArea(16, 58);
         JScrollPane scroll = new JScrollPane(display);
         table = new JTable();
@@ -320,81 +267,51 @@ public class main extends JFrame {
 
         add(westPanel, BorderLayout.WEST);
         add(centralPanel, BorderLayout.CENTER);
-//        add(pane,BorderLayout.CENTER);
         tableModel = new DefaultTableModel(new Object[]{"id","first name","last name"},0);
         table.setModel(tableModel);
-        btnReminder.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                MikeLogging mikeLogging = new MikeLogging();
-                MikeLoggingAdapter mikeLoggingAdapter = new MikeLoggingAdapter(mikeLogging);
-                mikeLoggingAdapter.store_info();
-            }
+        btnReminder.addActionListener(e -> {
+            MikeLogging mikeLogging = new MikeLogging();
+            MikeLoggingAdapter mikeLoggingAdapter = new MikeLoggingAdapter(mikeLogging);
+            mikeLoggingAdapter.store_info();
         });
 
-        btnAuthorsCRUD.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                crudFrame();
-            }
-        });
-        btnTexts.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                articleFrame();
-            }
-        });
+        btnAuthorsCRUD.addActionListener(e -> crudFrame());
+        btnTexts.addActionListener(e -> articleFrame());
 
-        btnRecognize.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String temp = "";
-                calculators param = new calculators();
-                param.calculate_param(display.getText());
-                System.out.println("param words: " + param.getWords());
-                List <Author> authors = dao.getAllAuthors();
-                for (Author f: authors){
-                    if (f.getAvg_words() <= param.getWords() &&
-                            (f.getAvg_words()*4 >= param.getWords())
-                            && f.getAvg_words() != 0
-                            ){
-                        System.out.println(" avg words" + f.getAvg_words() +
-                                " avg prepo " + f.getAvg_prepos() +
-                                " avg sent" + f.getAvg_sentences());
-                        temp += f.getFirstname() + " " + f.getLastname() + " ";
-                    }
+        btnRecognize.addActionListener(e -> {
+            String temp = "";
+            calculators param = new calculators();
+            param.calculate_param(display.getText());
+            System.out.println("param words: " + param.getWords());
+            List <Author> authors = dao.getAllAuthors();
+            for (Author f: authors){
+                if (f.getAvg_words() <= param.getWords() &&
+                        (f.getAvg_words()*4 >= param.getWords())
+                        && f.getAvg_words() != 0
+                        ){
+                    System.out.println(" avg words" + f.getAvg_words() +
+                            " avg prepo " + f.getAvg_prepos() +
+                            " avg sent" + f.getAvg_sentences());
+                    temp += f.getFirstname() + " " + f.getLastname() + " ";
                 }
-                if (temp.length() == 0) {
-                    temp = " - ";
-                }
-                String textpane = "Possible authors is: " + temp;
-                JOptionPane.showMessageDialog(null, textpane);
-
             }
+            if (temp.length() == 0) {
+                temp = " - ";
+            }
+            String textpane = "Possible authors is: " + temp;
+            JOptionPane.showMessageDialog(null, textpane);
+
         });
 
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                main frm = new main();
-                frm.setLocationByPlatform(true);
-                frm.pack();
-                frm.setDefaultCloseOperation(EXIT_ON_CLOSE);
-                frm.setVisible(true);
-
-//                ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
-//                ArticleDaoImpl daoArt = ctx.getBean("ArticleDaoImpl", ArticleDaoImpl.class);
-//                List <Article> k  = daoArt.getAllArticles();
-////                AuthorDaoImpl dao = ctx.getBean("AuthorDaoImpl", AuthorDaoImpl.class);
-////                List<Author> k = dao.getAllAuthors();
-//                for (Article f  : k){
-//                    System.out.println("Id" + f.getId() + " First name " + f.getContent());
-//
-//                }
-            }
+        SwingUtilities.invokeLater(() -> {
+            main frm = new main();
+            frm.setLocationByPlatform(true);
+            frm.pack();
+//            frm.setDefaultCloseOperation();
+            frm.setVisible(true);
         });
     }
 }
